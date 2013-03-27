@@ -4,15 +4,14 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\heating1.swf" />
-    <movie fps="15" />
-    <movie width="400" />
-    <movie height="300" />
+    <movie path="bin\heating3.swf" />
+    <movie fps="30" />
+    <movie width="800" />
+    <movie height="600" />
     <movie version="10" />
     <movie minorVersion="0" />
     <movie platform="Flash Player" />
     <movie background="#FFFFFF" />
-    <movie preferredSDK="Flex 3.6A, AIR 1.5.3;3.6.0, 1.5.3;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -67,7 +66,7 @@
   </intrinsics>
   <!-- Assets to embed into the output SWF -->
   <library>
-    <asset path="src\PIElens.as" update="..\IITB\PIElens.as" />
+    <!-- example: <asset path="..." id="..." update="..." glyphs="..." mode="..." place="..." sharepoint="..." /> -->
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>

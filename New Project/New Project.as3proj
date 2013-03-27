@@ -4,10 +4,10 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\heating1.swf" />
-    <movie fps="15" />
-    <movie width="400" />
-    <movie height="300" />
+    <movie path="bin\NewProject.swf" />
+    <movie fps="30" />
+    <movie width="800" />
+    <movie height="600" />
     <movie version="10" />
     <movie minorVersion="0" />
     <movie platform="Flash Player" />
@@ -51,6 +51,9 @@
   </includeLibraries>
   <!-- SWC Libraries -->
   <libraryPaths>
+    <element path="src\PIE_1.9.swc" />
+    <element path="src\PIE_1.9.swc" />
+    <element path="src\PIE_1.9.swc" />
     <element path="PIE_2.3.swc" />
   </libraryPaths>
   <!-- External Libraries -->
@@ -67,7 +70,7 @@
   </intrinsics>
   <!-- Assets to embed into the output SWF -->
   <library>
-    <asset path="src\PIElens.as" update="..\IITB\PIElens.as" />
+    <!-- example: <asset path="..." id="..." update="..." glyphs="..." mode="..." place="..." sharepoint="..." /> -->
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>

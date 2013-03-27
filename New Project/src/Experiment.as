@@ -1,12 +1,13 @@
 ﻿package
 {
-import flash.display.Sprite;
 import flash.events.MouseEvent;
 import mx.events.ItemClickEvent;
 import mx.skins.halo.DateChooserYearArrowSkin;
 import flash.geom.Point;
+import slabLibrary.PIEslab;
 import pie.graphicsLibrary.*;
 import pie.uiElements.*;
+import slabLibrary.PIEbulb;
 
 public class Experiment
 {
@@ -62,19 +63,11 @@ private var currentTime:Number;
  * This section stores the handles of Drawing and UI Objects
  *
  */
-private var sprite:Sprite;
+private var mainSlab:PIEslab;
+private var mainBulb:PIEbulb;
 private var hole:PIEarc;
 private var nextButton : PIEbutton;
 private var startButton : PIEbutton;
-private var mainSlab:PIErectangle;
-private var middleDrag1:PIErectangle;
-private var bulbDrag:PIEcircle;
-private var plusWire:PIEroundedRectangle;
-private var switchB:PIEline;
-private var switchBlack:PIErectangle;
-private var battery:PIEroundedRectangle;
-private var plusBattery:PIEroundedRectangle;
-private var bulbStatus:Boolean;
 /**
  *
  * This function is called by the PIE framework at the beginning of the experiment
@@ -108,7 +101,7 @@ public function Experiment(pie:PIE)
 	illustration = 0;
     /* Call a PIE framework function to set the dimensions of the drawing area, right panel and bottom panel */
     /* We will reserve 100% width and 100%height for the drawing area */
-    pieHandle.PIEsetDrawingArea(0.8,1.0);
+    pieHandle.PIEsetDrawingArea(1.0,1.0);
 
     /* Set the foreground ande background colours for the three areas */
     /* (Different panels are provided and you can set individually as well) */
@@ -123,7 +116,7 @@ public function Experiment(pie:PIE)
 	pieHandle.ResetControl.addClickListener(this.resetSimulation);
 	pieHandle.PIEcreatePauseButton();
 	pieHandle.PIEcreateSpeedButtons();
-    pieHandle.showDeveloperName("Roshan Piyush");
+   // pieHandle.showDeveloperName("Roshan Piyush");
     /* Initialise World Origin and Boundaries */
     this.resetWorld();
 
@@ -137,22 +130,6 @@ public function Experiment(pie:PIE)
     createExperimentObjects();
 }
 
-/*
- * This function resets the world boundaries and adjusts display to match the world boundaries
- */
-public function resetWorld():void
-{
-    /* get the PIE drawing area aspect ratio (width/height) to model the dimensions of our experiment area */
-    PIEaspectRatio = pieHandle.PIEgetDrawingAspectRatio();
-    /* Initialise World Origin and Boundaries */
-    worldHeight   = 200.0;                            
-    worldWidth  = worldHeight * PIEaspectRatio;   /* match world aspect ratio to PIE aspect ratio */
-    worldOriginX = (-worldWidth/2);               /* Origin at center */
-    worldOriginY = ( -worldHeight / 2);
-	pieHandle.showDeveloperName(PIEaspectRatio.toString());
-    pieHandle.PIEsetApplicationBoundaries(worldOriginX, worldOriginY, worldWidth, worldHeight);
-}
-
 /**
  *
  * This function is called by the PIE framework to reset the experiment to default values
@@ -161,38 +138,35 @@ public function resetWorld():void
  */
 public function resetExperiment():void
 {
-	currentTime = mainBulbR;
+	
 	
     /* Initialise Physics Parameters */
 	switch(illustration) {
 	case 0: 
 		pieHandle.showExperimentName("\t\t\t\t\t\t\t\t\t");
-		pieHandle.showExperimentName("Heating Effect of Bulb on Ice Slab");
-
-		mainBulbR = worldHeight /10;
-		mainBulbX = 0;
-		mainBulbY = -worldHeight / 8;
-		
-		mainSlabH = worldHeight / 4;
-		mainSlabW = worldWidth / 4;
-		
-		mainSlabX = -mainSlabW/2;
-		mainSlabY = 0;
-		currentTime = mainBulbR;
+		pieHandle.showExperimentName("Heating Effect of Bulb on Wax");
+		mainSlabX = 0.0;
+		mainSlabY = 0.0;
+		mainBulbX = 0.0;
+		mainBulbY = -23.0;
+		mainSlabH = 30.0;
+		mainSlabW = 5.0;
+		mainBulbR = 7.0;
+		mainSlabT = 2.0;
 		break;
 
 	case 1: 
 		pieHandle.showExperimentName("\t\t\t\t\t\t\t\t\t");
-		pieHandle.showExperimentName("Heating Effect of Bulb on Wax");		
-		mainBulbR = worldHeight /10;
-		mainBulbX = 0;
-		mainBulbY = -worldHeight / 8;
-		
-		mainSlabH = worldHeight / 3;
-		mainSlabW = worldWidth / 20;
-		
-		mainSlabX = -mainSlabW/2;
-		mainSlabY = 0;
+		pieHandle.showExperimentName("Heating Effect of Bulb on Ice Slab");
+		mainSlabX = 0.0;
+		mainSlabY = 0.0;
+		mainBulbX = 0.0;
+		holeRadius = 0.0;
+		mainBulbY = -15.0;
+		mainSlabH = 15.0;
+		mainSlabW = 30.0;
+		mainBulbR = 7.0;
+		mainSlabT = 2.0;
 		currentTime = mainBulbR;
 		break;
 	}
@@ -200,7 +174,22 @@ public function resetExperiment():void
 
 
 
+/*
+ * This function resets the world boundaries and adjusts display to match the world boundaries
+ */
+public function resetWorld():void
+{
+    /* get the PIE drawing area aspect ratio (width/height) to model the dimensions of our experiment area */
+    PIEaspectRatio = pieHandle.PIEgetDrawingAspectRatio();
 
+    /* Initialise World Origin and Boundaries */
+    worldWidth   = 150;                            /* 250 centimeters Width */
+    worldHeight  = worldWidth / PIEaspectRatio;   /* match world aspect ratio to PIE aspect ratio */
+    worldOriginX = (-worldWidth/2);               /* Origin at center */
+    worldOriginY = (-worldHeight/2);
+    pieHandle.PIEsetApplicationBoundaries(worldOriginX, worldOriginY, worldWidth, worldHeight);
+	pieHandle.showDeveloperName(worldHeight.toString());
+}
 
 /**
  *
@@ -214,24 +203,13 @@ public function nextFrame():void
 	var xBulb : Number;
 	var yBulb : Number;
 	var distance : Number;
-	var holeRadius : Number;
-	var dt:Number;
+	var cons : Number;
 	switch(illustration){
 	case 0:
-		xSlab = mainSlabX;
-		ySlab = mainSlabY;
-		xBulb = mainBulbX;
-		yBulb = mainBulbY;
-		distance = Math.sqrt(Math.pow(xSlab - xBulb, 2) + Math.pow(ySlab - yBulb, 2)) - mainBulbR;
-		dt = pieHandle.PIEgetDelay();
-		currentTime = currentTime + 0.01;
-		if ( getBulbStatus()) {
-			hole.changeSize(currentTime);
-		}
-		pieHandle.showDeveloperName(currentTime.toString());
+		meltWax();
 		break;
 	case 1:
-		meltWax();
+		meltSlab();
 		break;
 	}
 }
@@ -258,41 +236,56 @@ private function createExperimentObjects():void
 	pieHandle.addUIpanelChild(nextButton);
 
     /* Create Slab */
-	mainSlab = new PIErectangle(pieHandle, mainSlabX, mainSlabY, (mainSlabW), (mainSlabH), displayFColor);
-	mainSlab.setPIEvisible();
-	mainSlab.changeBorder(1, 0x000000, 0.5); 
+	mainSlab = new PIEslab(pieHandle, mainSlabX, mainSlabY, mainSlabH, mainSlabW, mainSlabT, slabColor);
+	mainSlab.changeFill(slabColor,0.5);
+
+    pieHandle.addDisplayChild(mainSlab);
+    mainSlab.changeFill(slabColor,0.5);
     pieHandle.addDisplayChild(mainSlab);
 	
-	hole = new PIEarc(pieHandle, mainBulbX, mainBulbY, mainBulbX+mainBulbR, mainBulbY, Math.PI, displayBColor);
+	hole = new PIEarc(pieHandle, mainBulbX, mainBulbY, mainBulbX-mainBulbR, mainBulbY, Math.PI, displayBColor);
 	hole.changeFillColor(displayBColor);
-	hole.setPIEvisible();
 	pieHandle.addDisplayChild(hole);
-	bulbStatus = false;
-    plusWire = new PIEroundedRectangle(pieHandle, mainBulbX+5*mainBulbR/4, ( mainBulbY-mainBulbR), (2*mainBulbR), (2*mainBulbR), 0x000000);
-	plusWire.changeBorder(2, 0x00FF00, 0.3);
-	pieHandle.addDisplayChild(plusWire);
-	battery = new PIEroundedRectangle(pieHandle, mainBulbX +2 * mainBulbR - 10, (mainBulbY-mainBulbR - 5), 20, 10, 0x0FF000);
-	pieHandle.addDisplayChild(battery);
-	plusBattery = new PIEroundedRectangle(pieHandle,mainBulbX +2 * mainBulbR + 10-3, (mainBulbY-mainBulbR-3), 6, 6, 0x0FF000);
-	pieHandle.addDisplayChild(plusBattery);
-	switchBlack = new PIErectangle(pieHandle,mainBulbX+5 * mainBulbR/2 , (mainBulbY+mainBulbR-7), 15, 14, 0x000000);
-	switchBlack.addClickListener(toggleSwitch);
-	pieHandle.addDisplayChild(switchBlack);
-	switchB = new PIEline(pieHandle, mainBulbX+5 * mainBulbR / 2, (mainBulbY+mainBulbR + 1) , mainBulbX+5 * mainBulbR / 2 + 5, mainBulbY+mainBulbR - 10, 0xFFFFFF, 4, 0.5);
-	switchB.addClickListener(toggleSwitch);
-	switchB.setPIEvisible();
-	pieHandle.addDisplayChild(switchB);
-	middleDrag1 = new PIErectangle(pieHandle,mainBulbX+mainBulbR / 2 , ((mainBulbY -mainBulbR / 2)), (mainBulbR), (mainBulbR), 0xFF2BD6);
-	middleDrag1.changeBorder(1, 0x000000, 0.5); 
-    pieHandle.addDisplayChild(middleDrag1);
-	bulbDrag = new PIEcircle(pieHandle, mainBulbX , mainBulbY, mainBulbR, displayFColor);
-	bulbDrag.changeBorder(1, 0x000000, 0.5); 
-    pieHandle.addDisplayChild(bulbDrag);
 	
-	
+	mainBulb = new PIEbulb(pieHandle, mainBulbX, mainBulbY, mainBulbR, bulbColor);
+    mainBulb.changeFill(slabColor,0.5);
+	mainBulb.bulbOff();
+    pieHandle.addDisplayChild(mainBulb);
+    mainBulb.changeFill(bulbColor,0.5);
+    pieHandle.addDisplayChild(mainBulb);
+
 	
 }
 
+
+
+public function handleSlabGrab(clickX:Number, clickY:Number):void
+{
+}
+
+
+public function handleSlabDrag(newX:Number, newY:Number, displacementX:Number, displacementY:Number):void
+{
+	
+    this.mainSlabX = newX;
+	this.mainSlabY = newY;
+}
+
+public function handleSlabDrop(newX:Number, newY:Number, displacementX:Number, displacementY:Number):void
+{
+    this.mainSlabX = newX;
+	this.mainSlabY = newY;
+}
+
+
+public function handleStretchBegin(clickX:Number, clickY:Number):void
+{
+}
+
+
+public function handleStretchEnd(newX:Number, newY:Number, displacementX:Number, displacementY:Number):void
+{
+}
 
 private function meltWax():void {
 	var xSlab : Number;
@@ -302,18 +295,18 @@ private function meltWax():void {
 	var distance : Number;
 	var dt:Number;
 	var cons : Number;
-	xSlab = mainSlabX;
-	ySlab = mainSlabY;
-	xBulb = mainBulbX;
-	yBulb = mainBulbY;
-	dt = pieHandle.PIEgetDelay();
-	distance = Math.sqrt(Math.pow(xSlab - xBulb, 2) + Math.pow(ySlab - yBulb, 2)) - mainBulbR - mainSlabH / 2;
-	if (mainSlabH > 0 && getBulbStatus()) {
-		distance = distance * 50;
-		mainSlab.changeSize(mainSlabW,mainSlabH-dt/distance);
-		mainSlab.changeLocation(xSlab, ySlab);
+	xSlab = mainSlab.getAnchorX();
+	ySlab = mainSlab.getAnchorY();
+	xBulb = mainBulb.getAnchorX();
+	yBulb = mainBulb.getAnchorY();
+	dt = pieHandle.PIEgetDelay()/50;
+	distance = Math.sqrt(Math.pow(xSlab - xBulb, 2) + Math.pow(ySlab - yBulb, 2)) - mainBulb.getRadius() - mainSlab.getHeight() / 2;
+	if (mainSlab.getHeight() > 0 && distance > 0 && mainBulb.getBulbStatus()) {
+		distance = Math.sqrt(Math.pow(xSlab - xBulb, 2) + Math.pow(ySlab - yBulb, 2)) - mainBulb.getRadius() - mainSlab.getHeight() / 2;
+		distance = distance * 5;
+		mainSlab.changeHeight(mainSlab.getHeight() - dt / distance);
+		mainSlab.changeLocation(xSlab, ySlab + 0.5*dt / distance);
 	}
-	pieHandle.showDeveloperName(mainSlabH.toString());
 }
 
 private function meltSlab():void {
@@ -324,17 +317,17 @@ private function meltSlab():void {
 	var distance : Number;
 	var holeRadius : Number;
 	var dt:Number;
-	xSlab = mainSlabX;
-	ySlab = mainSlabY;
-	xBulb = mainBulbX;
-	yBulb = mainBulbY;
-	distance = Math.sqrt(Math.pow(xSlab - xBulb, 2) + Math.pow(ySlab - yBulb, 2)) - mainBulbR;
-	dt = pieHandle.PIEgetDelay();
+	xSlab = mainSlab.getAnchorX();
+	ySlab = mainSlab.getAnchorY();
+	xBulb = mainBulb.getAnchorX();
+	yBulb = mainBulb.getAnchorY();
+	distance = Math.sqrt(Math.pow(xSlab - xBulb, 2) + Math.pow(ySlab - yBulb, 2)) - mainBulb.getRadius() - mainSlab.getHeight() / 2;
+	dt = pieHandle.PIEgetDelay()/100;
     currentTime = currentTime + dt/(currentTime*Math.sqrt(distance));
-	if ( getBulbStatus()) {
+	if (mainSlab.getHeight() > 0 && mainBulb.getBulbStatus()) {
 		hole.changeSize(currentTime);
+		
 	}
-	pieHandle.showDeveloperName(currentTime.toString());
 }
 
 
@@ -342,16 +335,20 @@ public function resetSimulation():void {
 	
 	this.resetExperiment();
 	mainSlab.changeLocation(mainSlabX, mainSlabY);
-	mainSlab.changeSize(mainSlabW, mainSlabH);
+	mainSlab.changeHeight(mainSlabH);
+	mainSlab.changeWidth(mainSlabW);
+	mainBulb.changeLocation(mainBulbX, mainBulbY);
 	pieHandle.PIEresetTimer();
-	bulbOff();
+	mainBulb.bulbOff();
 	switch(illustration) {
 		case 0:
 			hole.setPIEinvisible();
 			break;
 		case 1:
+			hole.changeLocation(mainBulbX, mainBulbY);
 			hole.setPIEvisible();
-			hole.changeSize(mainBulbR);
+			hole.changeSize(0);
+			hole.enablePIEtransform();
 			break;
 	}
 	
@@ -361,68 +358,24 @@ public function nextExperiment():void {
 	illustration = (illustration + 1) % 2;
 	this.resetExperiment();
 	mainSlab.changeLocation(mainSlabX, mainSlabY);
-	mainSlab.changeSize(mainSlabW, mainSlabH);
+	mainSlab.changeHeight(mainSlabH);
+	mainSlab.changeWidth(mainSlabW);
+	mainBulb.changeLocation(mainBulbX, mainBulbY);
 	pieHandle.PIEresetTimer();
-	bulbOff();
+	mainBulb.bulbOff();
 	switch(illustration) {
 		case 0:
-			hole.setPIEvisible();
-			hole.changeSize(mainBulbR);
-			break;
-		case 1:
 			hole.setPIEinvisible();
 			break;
+		case 1:
+			hole.changeLocation(mainBulbX, mainBulbY);
+			hole.setPIEvisible();
+			hole.changeSize(0);
+			hole.enablePIEtransform();
+			break;
 	}
+	
 }
-
-
-public function toggleSwitch():Boolean
-{
-	if (bulbStatus)
-	{
-		pieHandle.PIEpauseTimer();
-		bulbStatus = false;
-		bulbDrag.changeFillColor(0xFF2B06);
-		switchB.changeLine(mainBulbX+5 * mainBulbR / 2, mainBulbY+mainBulbR + 1 , mainBulbX+5 * this.mainBulbR / 2 + 5, mainBulbY + this.mainBulbR - 10);
-		return bulbStatus;
-	}else
-	{
-		pieHandle.PIEresumeTimer();
-		bulbStatus = true;
-		bulbDrag.changeFillColor(0xFFFFFF);
-		switchB.changeLine(mainBulbX+5 * this.mainBulbR / 2,mainBulbY+ (this.mainBulbR) , mainBulbX+ 5 * this.mainBulbR / 2 + 15, mainBulbY+ this.mainBulbR);
-		return bulbStatus;
-	}
-}
-
-public function bulbOff():Boolean {
-	if (bulbStatus)
-	{
-		pieHandle.PIEpauseTimer();
-		bulbStatus = false;
-		bulbDrag.changeFillColor(0xFF2B06);
-		switchB.changeLine(mainBulbX+5 * this.mainBulbR / 2, mainBulbY+(this.mainBulbR + 1) ,mainBulbX +5 * this.mainBulbR / 2 + 5,mainBulbY+ this.mainBulbR - 10);
-	}
-	return bulbStatus;
-}
-
-public function bulbOn():Boolean {
-	if (!bulbStatus)
-	{
-		pieHandle.PIEresumeTimer();
-		bulbStatus = true;
-		bulbDrag.changeFillColor(0xFFFFFF);
-		switchB.changeLine(mainBulbX+5 * mainBulbR / 2, (mainBulbY+mainBulbR + 1) , mainBulbX+5 * mainBulbR / 2 + 5, mainBulbY+mainBulbR - 10);
-	}
-	return bulbStatus;
-}
-
-public function getBulbStatus():Boolean {
-	return bulbStatus;
-}
-
-
-
 
 
 }   /* End of Class experiment */
